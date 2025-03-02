@@ -1,6 +1,6 @@
 class GameState:
-    def __init__(self):
-        self.board = [
+    def __init__(self, board=None):
+        self.board = board if board != None else [
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
             ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
             ["--", "--", "--", "--", "--", "--", "--", "--"], 

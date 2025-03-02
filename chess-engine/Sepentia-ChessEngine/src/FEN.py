@@ -1,21 +1,56 @@
+from ChessEngine import GameState, CastleRights
+
 class FEN:
-    def __init__(self):    
-        self.conversion = {
-            "bR" : "r", "bN" : "n",
-            "bB" : "b", "bQ" : "q",
-            "bK" : "k", "bp" : "p",
-            "wR" : "R", "wN" : "N",
-            "wB" : "B", "wQ" : "Q",
-            "wK" : "K", "wp" : "P",
-            "p" : "bp", "r" : "bR",
-            "n" : "bN", "b" : "bB",
-            "q" : "bQ", "k" : "bK",
-            "P" : "wp", "R" : "wR",
-            "N" : "wN", "B" : "wB",
-            "Q" : "wQ", "K" : "wK"
+    def __init__(self):
+        self.reverse_conversion = {
+            "r": "bR", "n": "bN", "b": "bB", "q": "bQ", "k": "bK", "p": "bp",
+            "R": "wR", "N": "wN", "B": "wB", "Q": "wQ", "K": "wK", "P": "wp"
         }
-    def boardToFen(self, board):
+
+    def fenToGameState(self, fen):
+        parts = fen.split()
+        board_part, turn, castling, enpassant, halfmove, fullMoves = parts
+
+        # Reconstruct board
+        board = []
+        rows = board_part.split('/')
+        for row in rows:
+            new_row = []
+            for char in row:
+                if char.isdigit():
+                    new_row.extend(["--"] * int(char))  # Empty squares
+                else:
+                    new_row.append(self.reverse_conversion.get(char, char))
+            board.append(new_row)
+
+        # Initialize GameState
+        gameState = GameState(board)
+        gameState.white_to_move = (turn == "w")
+
+        # Castling rights
+        gameState.current_castling_rights = CastleRights(
+            "K" in castling, "Q" in castling,
+            "k" in castling, "q" in castling
+        )
+
+        # En passant
+        if enpassant != "-":
+            file = ord(enpassant[0]) - ord('a')
+            rank = 8 - int(enpassant[1])
+            gameState.enpassant_possible = (rank, file)
+        else:
+            gameState.enpassant_possible = ()
+
+        # Move counter
+        gameState.move_counter = int(halfmove)
+
+        return gameState
+    
+    def gameStateToFen(self, gameState):
+        board = gameState.board
         fen = ""
+        
+        # Convert board state
         for row in board:
             empty = 0
             for square in row:
@@ -29,28 +64,32 @@ class FEN:
             if empty > 0:
                 fen += str(empty)
             fen += "/"
-        return fen.rstrip('/')
-    
-    def fenToBoard(self, fen):
-        board = []
-        rows = fen.split("/")
-        for row in rows:
-            boardRow = []
-            for square in row:
-                if square.isdigit():
-                    for i in range(int(square)):
-                        boardRow.append("--")
-                else:
-                    boardRow.append(self.conversion.get(square, square))
-            board.append(boardRow)
-        return board
-    
-board = [
-            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
-            ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"], 
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
-            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]]
+        
+        fen = fen.rstrip('/')  # Remove last slash
+
+        # Active player
+        fen += " " + ("w" if gameState.white_to_move else "b")
+
+        # Castling rights
+        castling = ""
+        if gameState.current_castling_rights.wks: castling += "K"
+        if gameState.current_castling_rights.wqs: castling += "Q"
+        if gameState.current_castling_rights.bks: castling += "k"
+        if gameState.current_castling_rights.bqs: castling += "q"
+        fen += " " + (castling if castling else "-")
+
+        # En passant target square
+        enpassant = (
+            chr(gameState.enpassant_possible[1] + ord('a')) + str(8 - gameState.enpassant_possible[0])
+            if gameState.enpassant_possible else "-"
+        )
+        fen += " " + enpassant
+
+        # Halfmove clock (Moves since last capture or pawn move)
+        fen += " " + str(gameState.move_counter)
+
+        # Fullmove number (Starts at 1 and increments after Black’s move)
+        fullmove_number = len(gameState.move_log) // 2 + 1
+        fen += " " + str(fullmove_number)
+
+        return fen

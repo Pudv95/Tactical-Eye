@@ -1,19 +1,13 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv").config();
-
+const express = require('express');
+const routes = require('./routes/move');
 const app = express();
-app.use(cors());
+
 app.use(express.json());
+app.use('/api', routes);
 
-const mongoURI = process.env.MONGO_URI || "mongodb://mongo:27017/tactical-eye-db";
-mongoose
-    .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("MongoDB connected!"))
-    .catch((err) => console.error("MongoDB connection error:", err));
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+    console.log(`Chess bot API running on http://localhost:${port}`);
+});
 
-app.get("/", (req, res) => res.send("Backend is running!"));
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+module.exports = app;

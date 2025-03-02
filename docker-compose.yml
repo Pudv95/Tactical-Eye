@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   backend:
     build: ./tactical-eye-backend
@@ -8,6 +10,9 @@ services:
       - MONGO_URI=mongodb://mongo:27017/tactical-eye-db
     depends_on:
       - mongo
+    volumes:
+      - ./tactical-eye-backend:/app  
+      - /app/node_modules 
 
   mongo:
     image: mongo
@@ -23,6 +28,9 @@ services:
       - "3000:80"
     depends_on:
       - backend
+    volumes:
+      - ./tactical-eye-frontend/tactical-eye:/app  
+      - /app/node_modules 
 
 volumes:
   mongo-data:
