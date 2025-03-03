@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "Chess.com Arrow Extension",
+    "version": "1.0",
+    "description": "Automatically adds arrows on Chess.com based on move input.",
+    "permissions": ["storage"],
+    "host_permissions": ["https://www.chess.com/*"],
+    "content_scripts": [
+      {
+        "matches": ["https://www.chess.com/*"],
+        "js": ["content.js"],
+        "run_at": "document_idle"
+      }
+    ]
+  }
+  
