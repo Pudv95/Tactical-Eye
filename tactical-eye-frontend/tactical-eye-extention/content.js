@@ -87,7 +87,7 @@ function getSquaresBetween(from, to) {
         currentRank += rankStep;
     }
 
-    squares.push(toSquareId(to)); 
+    squares.push(toSquareId(to));
 
     return squares.filter(Boolean);
 }
@@ -97,6 +97,55 @@ function removeHighlights() {
     highlights.forEach(highlight => highlight.remove());
 }
 
+let lastFen = ""; // Store the last FEN to detect changes
+function checkForMove() {
+    // Inject a script to extract the FEN and send it via postMessage
+    const script = document.createElement('script');
+    script.textContent = `
+        window.postMessage({ type: "FEN_DATA", fen: window.game.getFEN() }, "*");
+    `;
+    document.documentElement.appendChild(script);
+    script.remove();
+}
+
+// Listen for the extracted FEN
+window.addEventListener("message", (event) => {
+    if (event.source !== window) return; // Ensure it's from the same page
+    if (event.data && event.data.type === "FEN_DATA") {
+        const currentFen = event.data.fen;
+
+        if (currentFen !== lastFen) { // Detect a new move
+            lastFen = currentFen; // Update last known FEN
+            console.log(currentFen);
+
+            // Send FEN to API
+            fetch('http://localhost:5000/api/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fenstring: currentFen })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("API Response:", data);
+                    afterMoveProcessing(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+});
+
+
+
+
+// Function to process API response
+function afterMoveProcessing(apiResponse) {
+    console.log("Processing API response...", apiResponse);
+}
+
+// Run the check every second (adjust as needed)
+checkForMove();
 // Example usage
 highlightPath("d1", "h5");
 
