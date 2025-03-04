@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Chessboard } from "react-chessboard";
+import { Chess } from "chess.js"; // Import Chess.js for move validation and FEN updates
 
 const App: React.FC = () => {
   const [fen, setFen] = useState("start"); // Current FEN for Chessboard
   const [inputFen, setInputFen] = useState(""); // Temporary input field state
   const [image, setImage] = useState<File | null>(null); // Image file state
   const [bestMoveArrow, setBestMoveArrow] = useState<{ start: string; end: string; color: string } | null>(null);
+  const [game, setGame] = useState(new Chess()); // Chess.js game instance
 
   // Handle file upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,20 +22,26 @@ const App: React.FC = () => {
   // Call the Python backend to get the best move
   const getBestMove = async (currentFen: string) => {
     try {
-      const response = await fetch("http://localhost:5000/best-move", {
+      const response = await fetch("http://localhost:5000/api", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fen: currentFen }),
+        body: JSON.stringify({ fenstring: currentFen }),
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to fetch best move");
       }
-
+  
       const data = await response.json();
-      return data.bestMove; // Assuming the backend returns { bestMove: "e2e4" }
+      console.log("Backend response:", data); // Log the response
+  
+      if (!data.success) {
+        throw new Error("Backend returned an error");
+      }
+  
+      return data.move; // Ensure this matches the backend response
     } catch (error) {
       console.error("Error fetching best move:", error);
       return null;
@@ -44,6 +52,7 @@ const App: React.FC = () => {
   const updateFen = async () => {
     if (inputFen.trim() !== "") {
       setFen(inputFen); // Update the chessboard position
+      game.load(inputFen); // Update the Chess.js game instance
 
       // Get the best move from the Python backend
       const bestMove = await getBestMove(inputFen);
@@ -59,7 +68,40 @@ const App: React.FC = () => {
     } else {
       // If inputFen is empty, reset to the starting position
       setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+      game.reset(); // Reset the Chess.js game instance
       setBestMoveArrow(null); // Clear the best move arrow
+    }
+  };
+
+  // Handle piece movement
+  const onDrop = (sourceSquare: string, targetSquare: string) => {
+    try {
+      const move = game.move({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: "q", // Always promote to a queen for simplicity
+      });
+
+      if (move === null) return false; // Invalid move
+
+      setFen(game.fen()); // Update the FEN after a valid move
+
+      // Fetch the best move after the player's move
+      getBestMove(game.fen()).then((bestMove) => {
+        if (bestMove) {
+          const arrow = {
+            start: bestMove.slice(0, 2),
+            end: bestMove.slice(2, 4),
+            color: "green",
+          };
+          setBestMoveArrow(arrow);
+        }
+      });
+
+      return true; // Valid move
+    } catch (error) {
+      console.error("Invalid move:", error);
+      return false; // Invalid move
     }
   };
 
@@ -115,7 +157,7 @@ const App: React.FC = () => {
           position={fen} 
           boardWidth={400} 
           customArrows={bestMoveArrow ? [bestMoveArrow] : []} // Pass the best move arrow
-          arePiecesDraggable={false} // Disable piece movement
+          onPieceDrop={onDrop} // Enable piece movement
         />
       </div>
     </div>
