@@ -8,9 +8,12 @@ class FEN:
         }
 
     def fenToGameState(self, fen):
-        parts = fen.split()
-        board_part, turn, castling, enpassant, halfmove, fullMoves = parts
-
+        parts = fen.split()[-6:]
+        try:
+            board_part, turn, castling, enpassant, halfmove, fullMoves = parts
+        except Exception as e:
+            print(e)
+            return None
         # Reconstruct board
         board = []
         rows = board_part.split('/')

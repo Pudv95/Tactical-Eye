@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button POST Request</title>
+    <script>
+        function sendPostRequest() {
+            fetch('http://anas.com:5000/hello', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: 'Hello' })
+            })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+
+<body>
+    <button onclick="sendPostRequest()">Send POST Request</button>
+</body>
+
+</html>
