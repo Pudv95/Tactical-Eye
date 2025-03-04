@@ -21,7 +21,7 @@ const pythonTools = {
 
             });
             pythonProcess.on('close', (code) => {
-                console.log(`Process exited with code ${code}`);
+                console.log("failed")
                 reject(code.toString())
             });
         }).catch((err) => {
