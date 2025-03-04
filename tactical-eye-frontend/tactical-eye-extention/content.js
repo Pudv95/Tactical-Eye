@@ -40,8 +40,6 @@ function highlightPath(fromSquare, toSquare) {
         board.insertBefore(highlightDiv, coordinatesComment.nextSibling);
     });
 
-    // Add event listener to remove highlights when any piece is clicked
-    board.addEventListener("click", removeHighlights);
 }
 
 // Convert algebraic notation (e4, d4) to square classes
@@ -53,7 +51,6 @@ function getSquaresBetween(from, to) {
         let file = files.indexOf(square[0]) + 1;
         let rank = ranks.indexOf(square[1]) + 1;
         if (file === -1 || rank === -1) return null;
-        console.log(`square-${file}${rank}`)
         return `square-${file}${rank}`;
     }
 
@@ -107,31 +104,46 @@ function checkForMove() {
     document.documentElement.appendChild(script);
     script.remove();
 }
+function checkPlayer() {
+    // Inject a script to extract the FEN and send it via postMessage
+    const script = document.createElement('script');
+    script.textContent = `
+        window.postMessage({ type: "Player", player: window.game.getPlayingAs() }, "*");
+    `;
+    document.documentElement.appendChild(script);
+    script.remove();
+}
+var player = "0";
 
 // Listen for the extracted FEN
 window.addEventListener("message", (event) => {
-    if (event.source !== window) return; // Ensure it's from the same page
+    if (event.source !== window) return;
+    if (event.data && event.data.type === "Player" && player == "0") {
+        player = event.data.player == "1" ? "w" : "b";
+    }
     if (event.data && event.data.type === "FEN_DATA") {
         const currentFen = event.data.fen;
-
         if (currentFen !== lastFen) { // Detect a new move
-            lastFen = currentFen; // Update last known FEN
-            console.log(currentFen);
-
-            // Send FEN to API
-            fetch('http://localhost:5000/api/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ fenstring: currentFen })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("API Response:", data);
-                    afterMoveProcessing(data);
+            lastFen = currentFen;
+            if (currentFen.split(" ")[1] === player) {
+                console.log(player, currentFen);
+                fetch('http://localhost:5000/api/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fenstring: currentFen })
                 })
-                .catch(error => console.error('Error:', error));
+                    .then(response => response.json())
+                    .then(data => {
+                        afterMoveProcessing(data);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+            else {
+                removeHighlights();
+                console.log("Not your turn");
+            }
         }
     }
 });
@@ -141,12 +153,12 @@ window.addEventListener("message", (event) => {
 
 // Function to process API response
 function afterMoveProcessing(apiResponse) {
-    console.log("Processing API response...", apiResponse);
+    var move = apiResponse.move.split(" ");
+    removeHighlights();
+    highlightPath(move[0], move[1]);
 }
 
-// Run the check every second (adjust as needed)
-checkForMove();
-// Example usage
-highlightPath("d1", "h5");
+checkPlayer();
+setInterval(checkForMove, 1000);
 
 
