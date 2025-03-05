@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Chessboard } from "react-chessboard";
-import { Chess } from "chess.js"; // Import Chess.js for move validation and FEN updates
+import { Chess, Square } from "chess.js"; // Import Chess.js for move validation and FEN updates
+import { Arrow } from "react-chessboard/dist/chessboard/types";
 
 const App: React.FC = () => {
   const [fen, setFen] = useState("start"); // Current FEN for Chessboard
   const [inputFen, setInputFen] = useState(""); // Temporary input field state
   const [image, setImage] = useState<File | null>(null); // Image file state
-  const [bestMoveArrow, setBestMoveArrow] = useState<{ start: string; end: string; color: string } | null>(null);
+  const [bestMoveArrow, setBestMoveArrow] = useState< Arrow[] > ([]);
   const [game, setGame] = useState(new Chess()); // Chess.js game instance
 
   // Handle file upload
@@ -41,7 +42,16 @@ const App: React.FC = () => {
         throw new Error("Backend returned an error");
       }
   
-      return data.move; // Ensure this matches the backend response
+      var move = data.move;
+      const arrow: Arrow = [
+        move.slice(0, 2), // Extract the starting square (e.g., "e2")
+       move.slice(3, 5),   // Extract the ending square (e.g., "e4")
+       "red",              // Arrow color
+     ];
+     setBestMoveArrow([arrow])
+     console.log("new move = ", bestMoveArrow)
+     console.log(typeof bestMoveArrow)
+      return "arrow set successfully------------------";
     } catch (error) {
       console.error("Error fetching best move:", error);
       return null;
@@ -56,20 +66,12 @@ const App: React.FC = () => {
 
       // Get the best move from the Python backend
       const bestMove = await getBestMove(inputFen);
-      if (bestMove) {
-        // Convert the best move to arrow format
-        const arrow = {
-          start: bestMove.slice(0, 2), // Extract the starting square (e.g., "e2")
-          end: bestMove.slice(2, 4),   // Extract the ending square (e.g., "e4")
-          color: "green",              // Arrow color
-        };
-        setBestMoveArrow(arrow); // Set the best move arrow
-      }
+      console.log(bestMove)
     } else {
       // If inputFen is empty, reset to the starting position
       setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
       game.reset(); // Reset the Chess.js game instance
-      setBestMoveArrow(null); // Clear the best move arrow
+      setBestMoveArrow([]); // Clear the best move arrow
     }
   };
 
@@ -89,12 +91,7 @@ const App: React.FC = () => {
       // Fetch the best move after the player's move
       getBestMove(game.fen()).then((bestMove) => {
         if (bestMove) {
-          const arrow = {
-            start: bestMove.slice(0, 2),
-            end: bestMove.slice(2, 4),
-            color: "green",
-          };
-          setBestMoveArrow(arrow);
+          console.log(bestMove)
         }
       });
 
@@ -104,6 +101,10 @@ const App: React.FC = () => {
       return false; // Invalid move
     }
   };
+
+  useEffect(() => {
+    console.log("Best move arrow:", bestMoveArrow);
+  }, [bestMoveArrow]);
 
   return (
     <div 
@@ -156,7 +157,7 @@ const App: React.FC = () => {
         <Chessboard 
           position={fen} 
           boardWidth={400} 
-          customArrows={bestMoveArrow ? [bestMoveArrow] : []} // Pass the best move arrow
+          customArrows= {bestMoveArrow}        
           onPieceDrop={onDrop} // Enable piece movement
         />
       </div>
