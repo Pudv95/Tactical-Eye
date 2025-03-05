@@ -1,14 +1,13 @@
 import React, { useState,useEffect } from "react";
 import { Chessboard } from "react-chessboard";
-import { Chess, Square } from "chess.js"; // Import Chess.js for move validation and FEN updates
+import { Chess } from "chess.js"; // Import Chess.js for move validation and FEN updates
 import { Arrow } from "react-chessboard/dist/chessboard/types";
 
 const App: React.FC = () => {
   const [fen, setFen] = useState("start"); // Current FEN for Chessboard
   const [inputFen, setInputFen] = useState(""); // Temporary input field state
-  const [image, setImage] = useState<File | null>(null); // Image file state
   const [bestMoveArrow, setBestMoveArrow] = useState< Arrow[] > ([]);
-  const [game, setGame] = useState(new Chess()); // Chess.js game instance
+  const [game, _] = useState(new Chess()); // Chess.js game instance
 
   // Handle file upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
