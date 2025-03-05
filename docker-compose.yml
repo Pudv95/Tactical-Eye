@@ -7,30 +7,8 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=development
-      - MONGO_URI=mongodb://mongo:27017/tactical-eye-db
     depends_on:
       - mongo
     volumes:
       - ./tactical-eye-backend:/app  
       - /app/node_modules 
-
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-  frontend:
-    build: ./tactical-eye-frontend/tactical-eye
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    volumes:
-      - ./tactical-eye-frontend/tactical-eye:/app  
-      - /app/node_modules 
-
-volumes:
-  mongo-data:

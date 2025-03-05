@@ -2,6 +2,7 @@ import React, { useState,useEffect } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js"; // Import Chess.js for move validation and FEN updates
 import { Arrow } from "react-chessboard/dist/chessboard/types";
+import env from "react-dotenv";
 
 const App: React.FC = () => {
   const [fen, setFen] = useState("start"); // Current FEN for Chessboard
@@ -21,8 +22,9 @@ const App: React.FC = () => {
 
   // Call the Python backend to get the best move
   const getBestMove = async (currentFen: string) => {
+    const baseURI = env.BASE_URL;
     try {
-      const response = await fetch("https://tactical-eye.onrender.com/api/", {
+      const response = await fetch(`${baseURI}/api/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
