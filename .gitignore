@@ -1,3 +1,3 @@
 *.env
 */node_module
-*/__pycahe__
+*/__pycache__
