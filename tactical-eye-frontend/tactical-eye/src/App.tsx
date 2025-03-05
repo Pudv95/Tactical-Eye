@@ -4,14 +4,14 @@ import { Chessboard } from "react-chessboard";
 const App: React.FC = () => {
   const [fen, setFen] = useState("start"); // Current FEN for Chessboard
   const [inputFen, setInputFen] = useState(""); // Temporary input field state
-  const [image, setImage] = useState<File | null>(null); // Image file state
-  const [bestMoveArrow, setBestMoveArrow] = useState<{ start: string; end: string; color: string } | null>(null);
+  // const [image, setImage] = useState<File | null>(null); // Image file state
+  // const [bestMoveArrow, setBestMoveArrow] = useState<{ start: string; end: string; color: string } | null>(null);
 
   // Handle file upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      setImage(file); // Store image file
+      // setImage(file); // Store image file
       console.log("Image uploaded:", file.name);
       alert("Image uploaded! (Now integrate API to extract FEN)");
     }
@@ -20,7 +20,7 @@ const App: React.FC = () => {
   // Call the Python backend to get the best move
   const getBestMove = async (currentFen: string) => {
     try {
-      const response = await fetch("http://localhost:5000/best-move", {
+      const response = await fetch("https://tactical-eye.onrender.com/api/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,17 +49,17 @@ const App: React.FC = () => {
       const bestMove = await getBestMove(inputFen);
       if (bestMove) {
         // Convert the best move to arrow format
-        const arrow = {
-          start: bestMove.slice(0, 2), // Extract the starting square (e.g., "e2")
-          end: bestMove.slice(2, 4),   // Extract the ending square (e.g., "e4")
-          color: "green",              // Arrow color
-        };
-        setBestMoveArrow(arrow); // Set the best move arrow
+        // const arrow = {
+        //   start: bestMove.slice(0, 2), // Extract the starting square (e.g., "e2")
+        //   end: bestMove.slice(2, 4),   // Extract the ending square (e.g., "e4")
+        //   color: "green",              // Arrow color
+        // };
+        // setBestMoveArrow(arrow); // Set the best move arrow
       }
     } else {
       // If inputFen is empty, reset to the starting position
       setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-      setBestMoveArrow(null); // Clear the best move arrow
+      // setBestMoveArrow(null); // Clear the best move arrow
     }
   };
 
@@ -114,7 +114,7 @@ const App: React.FC = () => {
         <Chessboard 
           position={fen} 
           boardWidth={400} 
-          customArrows={bestMoveArrow ? [bestMoveArrow] : []} // Pass the best move arrow
+          // customArrows={bestMoveArrow ? [bestMoveArrow] : []} // Pass the best move arrow
           arePiecesDraggable={false} // Disable piece movement
         />
       </div>
