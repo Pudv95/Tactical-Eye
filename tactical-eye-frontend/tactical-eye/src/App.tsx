@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      setImage(file); // Store image file
+      // setImage(file); // Store image file
       console.log("Image uploaded:", file.name);
       alert("Image uploaded! (Now integrate API to extract FEN)");
     }
@@ -23,7 +23,7 @@ const App: React.FC = () => {
   // Call the Python backend to get the best move
   const getBestMove = async (currentFen: string) => {
     try {
-      const response = await fetch("http://localhost:5000/api", {
+      const response = await fetch("https://tactical-eye.onrender.com/api/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -99,6 +99,7 @@ const App: React.FC = () => {
     } catch (error) {
       console.error("Invalid move:", error);
       return false; // Invalid move
+
     }
   };
 
@@ -158,7 +159,7 @@ const App: React.FC = () => {
           position={fen} 
           boardWidth={400} 
           customArrows= {bestMoveArrow}        
-          onPieceDrop={onDrop} // Enable piece movement
+          onPieceDrop={onDrop} 
         />
       </div>
     </div>
