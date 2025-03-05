@@ -1,13 +1,12 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js"; // Import Chess.js for move validation and FEN updates
 import { Arrow } from "react-chessboard/dist/chessboard/types";
-import env from "react-dotenv";
 
 const App: React.FC = () => {
   const [fen, setFen] = useState("start"); // Current FEN for Chessboard
   const [inputFen, setInputFen] = useState(""); // Temporary input field state
-  const [bestMoveArrow, setBestMoveArrow] = useState< Arrow[] > ([]);
+  const [bestMoveArrow, setBestMoveArrow] = useState<Arrow[]>([]);
   const [game, _] = useState(new Chess()); // Chess.js game instance
 
   // Handle file upload
@@ -22,7 +21,7 @@ const App: React.FC = () => {
 
   // Call the Python backend to get the best move
   const getBestMove = async (currentFen: string) => {
-    const baseURI = env.BASE_URL;
+    const baseURI = process.env.BASE_URL;
     try {
       const response = await fetch(`${baseURI}/api/`, {
         method: "POST",
@@ -31,27 +30,27 @@ const App: React.FC = () => {
         },
         body: JSON.stringify({ fenstring: currentFen }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to fetch best move");
       }
-  
+
       const data = await response.json();
       console.log("Backend response:", data); // Log the response
-  
+
       if (!data.success) {
         throw new Error("Backend returned an error");
       }
-  
+
       var move = data.move;
       const arrow: Arrow = [
         move.slice(0, 2), // Extract the starting square (e.g., "e2")
-       move.slice(3, 5),   // Extract the ending square (e.g., "e4")
-       "red",              // Arrow color
-     ];
-     setBestMoveArrow([arrow])
-     console.log("new move = ", bestMoveArrow)
-     console.log(typeof bestMoveArrow)
+        move.slice(3, 5),   // Extract the ending square (e.g., "e4")
+        "red",              // Arrow color
+      ];
+      setBestMoveArrow([arrow])
+      console.log("new move = ", bestMoveArrow)
+      console.log(typeof bestMoveArrow)
       return "arrow set successfully------------------";
     } catch (error) {
       console.error("Error fetching best move:", error);
@@ -109,7 +108,7 @@ const App: React.FC = () => {
   }, [bestMoveArrow]);
 
   return (
-    <div 
+    <div
       style={{
         display: "flex",
         flexDirection: "column",
@@ -123,10 +122,10 @@ const App: React.FC = () => {
       <h1>Chessboard with Best Move Arrow</h1>
 
       {/* Upload Image Button */}
-      <input 
-        type="file" 
-        accept="image/*" 
-        onChange={handleImageUpload} 
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
         style={{ marginBottom: "10px", padding: "5px" }}
       />
 
@@ -140,27 +139,27 @@ const App: React.FC = () => {
       />
 
       {/* Enter Button */}
-      <button 
-        onClick={updateFen} 
+      <button
+        onClick={updateFen}
         style={{ padding: "8px 12px", marginBottom: "10px", cursor: "pointer" }}
       >
         Enter
       </button>
 
       {/* Centered Chessboard */}
-      <div 
-        style={{ 
-          display: "flex", 
-          justifyContent: "center", 
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
           alignItems: "center",
           marginTop: "20px"
         }}
       >
-        <Chessboard 
-          position={fen} 
-          boardWidth={400} 
-          customArrows= {bestMoveArrow}        
-          onPieceDrop={onDrop} 
+        <Chessboard
+          position={fen}
+          boardWidth={400}
+          customArrows={bestMoveArrow}
+          onPieceDrop={onDrop}
         />
       </div>
     </div>
