@@ -8,8 +8,6 @@ function getMoveCoordinates(fen, algebraicMove) {
     const move = chess.move(algebraicMove);
     const sourceSquare = move ? move.from : null;
     const destination = move ? move.to : null;
-    console.log("sourceSquare = ", sourceSquare);
-    console.log("destination = ", destination);
     return sourceSquare ? `${sourceSquare} ${destination}` : "Piece not found!";
 }
 
