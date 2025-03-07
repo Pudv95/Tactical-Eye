@@ -1,9 +1,12 @@
 import FEN
 import ChessAI
+import ChessEngine
 import sys
 from multiprocessing import Process, Queue
 
-fenstr = sys.argv[1]
+test =  ""
+
+fenstr = test if len(sys.argv) == 1 else sys.argv[1]
 
 fen = FEN.FEN()
 game_state = fen.fenToGameState(fenstr)
@@ -20,9 +23,9 @@ move_finder_process.join()
 
 if not return_queue.empty():
     ai_move = return_queue.get()
+
 else:
     ai_move = ChessAI.findRandomMove(valid_moves)  
-
 
 print(ai_move,end="")
 
