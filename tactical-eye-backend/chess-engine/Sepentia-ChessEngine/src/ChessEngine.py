@@ -606,22 +606,29 @@ class Move:
             return "O-O-O" if self.end_col == 2 else "O-O"
         
         end_square = self.getRankFile(self.end_row, self.end_col)
-        piece_symbol = "" if self.piece_moved[1] == "p" else self.piece_moved[1]
+        piece_symbol = "" if self.piece_moved[1] == "p" else self.piece_moved[1].upper()
 
-        disambiguation = self.getDisambiguation()
-        capture_symbol = "x" if self.is_capture else ""
+        if self.piece_moved[1] == "p":
+            if self.is_capture:
+                start_file = self.getRankFile(self.start_row, self.start_col)[0]
+                notation = f"{start_file}x{end_square}"
+            else:
+                notation = end_square
+        else:
+            disambiguation = self.getDisambiguation()
+            capture_symbol = "x" if self.is_capture else ""
+            notation = f"{piece_symbol}{disambiguation}{capture_symbol}{end_square}"
 
         if self.is_pawn_promotion:
-            return f"{end_square}=Q"
+            notation += f"={self.promotion_piece.upper()}"
 
-        notation = f"{piece_symbol}{disambiguation}{capture_symbol}{end_square}"
-        
         if self.is_checkmate:
             notation += "#"
         elif self.is_check:
             notation += "+"
 
         return notation
+
 
     def getRankFile(self, row, col):
         return self.cols_to_files[col] + self.rows_to_ranks[row]
