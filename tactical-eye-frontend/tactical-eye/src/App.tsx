@@ -45,12 +45,12 @@ const App: React.FC = () => {
       var move = data.move;
       const arrow: Arrow = [
         move.slice(0, 2), // Extract the starting square (e.g., "e2")
-        move.slice(3, 5),   // Extract the ending square (e.g., "e4")
-        "red",              // Arrow color
-      ];
-      setBestMoveArrow([arrow])
-      console.log("new move = ", bestMoveArrow)
-      console.log(typeof bestMoveArrow)
+       move.slice(3, 5),   // Extract the ending square (e.g., "e4")
+       "red",              // Arrow color
+     ];
+     setBestMoveArrow([arrow])
+     console.log("new move = ", bestMoveArrow)
+     console.log(typeof bestMoveArrow)
       return "arrow set successfully------------------";
     } catch (error) {
       console.error("Error fetching best move:", error);
@@ -108,62 +108,107 @@ const App: React.FC = () => {
   }, [bestMoveArrow]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        width: "100vw",
-        textAlign: "center",
-      }}
-    >
-      <h1>Chessboard with Best Move Arrow</h1>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", width: "100vw", overflow: "hidden" }}>
+      {/* Header */}
+      <h1 style={{ 
+        margin: "10px 0", 
+        fontSize: "2.5rem", 
+        fontWeight: "800", 
+        textAlign: "center", 
+        fontFamily: "'Roboto', sans-serif", 
+        textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)", 
+        color: "#C0C0C0" 
+      }}>
+        Tactical Eye
+      </h1>
 
-      {/* Upload Image Button */}
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        style={{ marginBottom: "10px", padding: "5px" }}
-      />
+      {/* Main Content */}
+      <div style={{ display: "flex", flex: 1, padding: "10px", overflow: "hidden" }}>
+        {/* Left Side: Chessboard */}
+        <div style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center",marginLeft: "50px", overflow: "hidden" }}>
+          <Chessboard
+            position={fen}
+            boardWidth={450} // Adjust the size to fit the viewport
+            customArrows={bestMoveArrow}
+            onPieceDrop={onDrop}
+          />
+        </div>
 
-      {/* Enter FEN String Manually */}
-      <input
+        {/* Right Side: Controls */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "10px", overflow: "hidden" }}>
+          {/* FEN Input */}
+          <input
         type="text"
         value={inputFen}
         onChange={(e) => setInputFen(e.target.value)}
         placeholder="Enter FEN string"
-        style={{ marginBottom: "10px", padding: "5px", width: "300px", textAlign: "center" }}
+        style={{
+          marginBottom: "10px",
+          padding: "8px",
+          width: "80%",
+          textAlign: "center",
+          fontSize: "1rem",
+          border: "2px solid rgb(50, 57, 65)", // Add a blue border
+          borderRadius: "4px", // Rounded corners
+          outline: "none", // Remove default focus outline
+        }}
       />
 
-      {/* Enter Button */}
-      <button
-        onClick={updateFen}
-        style={{ padding: "8px 12px", marginBottom: "10px", cursor: "pointer" }}
-      >
-        Enter
-      </button>
+          {/* Enter Button */}
+          <button
+            onClick={updateFen}
+            style={{ padding: "8px 16px", marginBottom: "10px", cursor: "pointer", fontSize: "1rem" }}
+          >
+            Update FEN
+          </button>
 
-      {/* Centered Chessboard */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: "20px"
-        }}
-      >
-        <Chessboard
-          position={fen}
-          boardWidth={400}
-          customArrows={bestMoveArrow}
-          onPieceDrop={onDrop}
-        />
+          {/* "OR" Text */}
+          <p style={{ margin: "10px 0", fontSize: "1rem", color: "#666" }}>OR</p>
+
+          {/* Image Upload */}
+          <div style={{ position: "relative", marginBottom: "10px" }}>
+  {/* Hidden File Input */}
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageUpload}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        opacity: 0, // Hide the input
+        cursor: "pointer", // Show pointer cursor
+      }}
+      id="file-input" // Add an ID for the label
+    />
+
+    {/* Custom Button */}
+    <label
+      htmlFor="file-input" // Associate label with the input
+      style={{
+        display: "inline-block",
+        padding: "8px 28px",
+        fontSize: "1rem",
+        border: "2px solid #007bff", // Blue border
+        borderRadius: "4px", // Rounded corners
+        backgroundColor: "#007bff", // Blue background
+        color: "#fff", // White text
+        cursor: "pointer", // Pointer cursor
+        textAlign: "center",
+      }}
+    >
+      Upload
+    </label>
+  </div>
+          {/* Loading Indicator */}
+          {/* {isLoading && <p style={{ fontSize: "1rem" }}>Loading best move...</p>} */}
+        </div>
       </div>
     </div>
   );
 };
+
 
 export default App;
