@@ -1,16 +1,30 @@
 {
-    "manifest_version": 3,
-    "name": "Chess.com Arrow Extension",
-    "version": "1.0",
-    "description": "Automatically adds arrows on Chess.com based on move input.",
-    "permissions": ["storage"],
-    "host_permissions": ["https://www.chess.com/*"],
-    "content_scripts": [
-      {
-        "matches": ["https://www.chess.com/*"],
-        "js": ["content.js"],
-        "run_at": "document_idle"
-      }
-    ]
+  "name": "Chess.com FEN Generator",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Extracts FEN from Chess.com and allows customization.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "chess-fen-generator@pudv95.me",
+      "strict_min_version": "109.0"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.chess.com/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "./pop-up/popup.html",
+    "default_title": "Generate FEN"
   }
-  
+}

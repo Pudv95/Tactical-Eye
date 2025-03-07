@@ -1,3 +1,72 @@
+function extractContent() {
+    // Get the entire HTML of the page
+
+    let pagecontent = document.querySelector("wc-chess-board.board");
+    if (!pagecontent) {
+        console.error("Chess board not found!");
+        return;
+    }
+    let pageHTML = pagecontent.outerHTML;
+
+    pageHTML = pageHTML.split("").reverse().join("")
+
+    // Use regex to extract content between the comments
+    let match = pageHTML.match(/>--seceiP\/--!<([\s\S]*?)>--stceffE\/--!</);
+
+    if (match && match[1]) {
+        let extractedContent = match[1].trim();
+        const fenString =htmlToFEN(extractedContent.split("").reverse().join(""));
+        console.log("Extracted Content:\n", fenString);
+        try{
+            browser.storage.local.set({ fenString });
+        }
+        catch(e){
+            console.log(e);
+        }
+    } else {
+        console.log("Content not found between <!--/Effects--> and <!--Pieces-->");
+    }
+}
+function htmlToFEN(htmlString) {
+    // Piece mappings
+    const pieceMap = {
+        'wp': 'P', 'wn': 'N', 'wb': 'B', 'wr': 'R', 'wq': 'Q', 'wk': 'K',
+        'bp': 'p', 'bn': 'n', 'bb': 'b', 'br': 'r', 'bq': 'q', 'bk': 'k'
+    };
+
+    // Initialize empty 8x8 board
+    let board = Array.from({ length: 8 }, () => Array(8).fill(null));
+
+    // Parse HTML string and extract piece positions
+    const regex = /class="piece (\w+) square-(\d{2})"/g;
+    let match;
+    
+    while ((match = regex.exec(htmlString)) !== null) {
+        let [_, piece, square] = match;
+        let file = parseInt(square[0]) - 1;  // Convert file to 0-indexed
+        let rank = 8 - parseInt(square[1]);  // Convert rank to 0-indexed
+
+        board[rank][file] = pieceMap[piece]; // Place the piece on the board
+    }
+
+    // Convert board to FEN
+    let fen = board.map(row => {
+        let emptyCount = 0;
+        return row.map(cell => {
+            if (!cell) {
+                emptyCount++;
+                return null;
+            } else {
+                let result = emptyCount > 0 ? emptyCount + cell : cell;
+                emptyCount = 0;
+                return result;
+            }
+        }).join('') + (emptyCount > 0 ? emptyCount : '');
+    }).join('/');
+
+    return fen + ' w KQkq - 0 1'; // Default extras (to be adjusted if needed)
+}
+
 function highlightPath(fromSquare, toSquare) {
     // Find the chess board
     const board = document.querySelector("wc-chess-board.board");
@@ -158,7 +227,9 @@ function afterMoveProcessing(apiResponse) {
     highlightPath(move[0], move[1]);
 }
 
-checkPlayer();
-setInterval(checkForMove, 1000);
+// checkPlayer();
+// setInterval(extractContent, 1000);
+console.log("reloaded");
+extractContent();
 
 
