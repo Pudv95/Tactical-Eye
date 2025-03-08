@@ -1,6 +1,5 @@
 import FEN
 import ChessAI
-import ChessEngine
 import sys
 from multiprocessing import Process, Queue
 

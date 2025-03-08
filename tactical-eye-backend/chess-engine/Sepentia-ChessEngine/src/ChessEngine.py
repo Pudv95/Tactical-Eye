@@ -683,4 +683,4 @@ class Move:
             return self.cols_to_files[self.start_col]
 
     def __str__(self):
-        return f"{self.getChessNotation()} move with startCol: {self.start_col}, startRow: {self.start_row}, endCol: {self.end_col}, endRow: {self.end_row}"
+        return f"{self.getChessNotation()}"
