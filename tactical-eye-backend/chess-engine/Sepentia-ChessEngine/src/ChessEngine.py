@@ -64,14 +64,27 @@ class GameState:
 
         # castle move
         if move.is_castle_move:
-            if move.end_col - move.start_col == 2:  # king-side castle move
-                self.board[move.end_row][move.end_col - 1] = self.board[move.end_row][
-                    move.end_col + 1]  # moves the rook to its new square
-                self.board[move.end_row][move.end_col + 1] = '--'  # erase old rook
-            else:  # queen-side castle move
-                self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][
-                    move.end_col - 2]  # moves the rook to its new square
-                self.board[move.end_row][move.end_col - 2] = '--'  # erase old rook
+            try:
+                if move.end_col - move.start_col == 2:  # king-side castle move
+                    self.board[move.end_row][move.end_col - 1] = self.board[move.end_row][
+                        move.end_col + 1]  # moves the rook to its new square
+                    self.board[move.end_row][move.end_col + 1] = '--'  # erase old rook
+                else:  # queen-side castle move
+                    self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][
+                        move.end_col - 2]  # moves the rook to its new square
+                    self.board[move.end_row][move.end_col - 2] = '--'  # erase old rook
+            except IndexError as e:
+                with open("error.log", "a") as f:
+                    f.write("IndexError: " + str(e) + "\n")
+                    f.write(str(move) + "\n")
+                    f.write(str(self)+ "\n")
+                    f.write("-------------------------------------------------\n")
+            except Exception as e:
+                with open("error.log", "a") as f:
+                    f.write("Unexpected error: " + str(e) + "\n")
+                    f.write(str(move) + "\n")
+                    f.write("-------------------------------------------------\n")
+
 
         self.enpassant_possible_log.append(self.enpassant_possible)
 
@@ -113,12 +126,20 @@ class GameState:
                 -1]  # set the current castle rights to the last one in the list
             # undo the castle move
             if move.is_castle_move:
-                if move.end_col - move.start_col == 2:  # king-side
-                    self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 1]
-                    self.board[move.end_row][move.end_col - 1] = '--'
-                else:  # queen-side
-                    self.board[move.end_row][move.end_col - 2] = self.board[move.end_row][move.end_col + 1]
-                    self.board[move.end_row][move.end_col + 1] = '--'
+                try:
+                    if move.end_col - move.start_col == 2:  # king-side
+                        self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 1]
+                        self.board[move.end_row][move.end_col - 1] = '--'
+                    else:  # queen-side
+                        self.board[move.end_row][move.end_col - 2] = self.board[move.end_row][move.end_col + 1]
+                        self.board[move.end_row][move.end_col + 1] = '--'
+                except IndexError as e:
+                    with open("error.log", "a") as f:
+                        f.write("IndexError: " + str(e) + "\n")
+                        f.write(str(move) + "\n")
+                        f.write(str(self)+ "\n")
+                        f.write("-------------------------------------------------\n")
+
             self.checkmate = False
             self.stalemate = False
 
@@ -557,6 +578,9 @@ class GameState:
         if self.board[row][col - 1] == '--' and self.board[row][col - 2] == '--' and self.board[row][col - 3] == '--':
             if not self.squareUnderAttack(row, col - 1) and not self.squareUnderAttack(row, col - 2):
                 moves.append(Move((row, col), (row, col - 2), self, is_castle_move=True,))
+    
+    def __str__(self):
+        return "\n".join([" ".join(row) for row in self.board])
 
 
 class CastleRights:
@@ -659,4 +683,4 @@ class Move:
             return self.cols_to_files[self.start_col]
 
     def __str__(self):
-        return self.getChessNotation()
+        return f"{self.getChessNotation()} move with startCol: {self.start_col}, startRow: {self.start_row}, endCol: {self.end_col}, endRow: {self.end_row}"
