@@ -31,6 +31,10 @@ const moveController = {
             res.json({ success: false, message: "Invalid move" });
             return
         }
+        if (result == "None") {
+            res.json({ success: true, message: "Checkmated" });
+            return
+        }
         res.json({ success: true, move: getMoveCoordinates(fenstr, result) });
     },
 

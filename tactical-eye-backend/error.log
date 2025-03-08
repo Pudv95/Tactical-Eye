@@ -4640,3 +4640,47 @@ bp bp -- -- -- -- bp bp
 wp wp -- -- -- wp wp --
 wR -- -- wR -- wK -- --
 -------------------------------------------------
+IndexError: list index out of range
+O-O move with startCol: 5, startRow: 7, endCol: 7, endRow: 7
+-- -- -- -- -- bR bK bR
+bp bp -- -- -- -- bp bp
+-- -- bp bN -- -- -- --
+-- -- -- -- -- -- -- --
+-- -- -- bp -- wN -- --
+-- -- -- wp -- -- -- wp
+wp wp -- -- -- wp wp --
+wR -- -- wR -- -- -- wK
+-------------------------------------------------
+IndexError: list assignment index out of range
+O-O move with startCol: 5, startRow: 7, endCol: 7, endRow: 7
+-- -- -- -- -- bR bK bR
+bp bp -- -- -- -- bp bp
+-- -- bp bN -- -- -- --
+-- -- -- -- -- -- -- --
+-- -- -- bp -- wN -- --
+-- -- -- wp -- -- -- wp
+wp wp -- -- -- wp wp --
+wR -- -- wR -- wK -- --
+-------------------------------------------------
+IndexError: list index out of range
+O-O move with startCol: 5, startRow: 7, endCol: 7, endRow: 7
+-- -- -- -- -- bR bK bR
+bp bp -- -- -- -- bp bp
+-- -- bp -- -- -- -- --
+-- -- -- -- -- bN -- --
+-- -- -- -- -- -- -- --
+-- -- bp wp -- -- -- wp
+wp wp -- -- -- wp wp --
+wR -- -- wR -- -- -- wK
+-------------------------------------------------
+IndexError: list assignment index out of range
+O-O move with startCol: 5, startRow: 7, endCol: 7, endRow: 7
+-- -- -- -- -- bR bK bR
+bp bp -- -- -- -- bp bp
+-- -- bp -- -- -- -- --
+-- -- -- -- -- bN -- --
+-- -- -- -- -- -- -- --
+-- -- bp wp -- -- -- wp
+wp wp -- -- -- wp wp --
+wR -- -- wR -- wK -- --
+-------------------------------------------------
