@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "Tactical Eye",
+    "version": "1.0.0",
+    "description": "Well I'm bad at chess so I made this to help me out",
+    "action": {
+        "default_popup": "index.html"
+    },
+    "icons": {
+        "32": "images/chess.png"
+    },
+    "permissions": [
+        "storage",
+        "scripting"
+    ],
+    "host_permissions": [
+        "https://www.chess.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.chess.com/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}
