@@ -6,6 +6,11 @@
     "action": {
         "default_popup": "index.html"
     },
+    "background": {
+        "scripts": [
+            "background.js"
+        ]
+    },
     "icons": {
         "32": "images/chess.png"
     },

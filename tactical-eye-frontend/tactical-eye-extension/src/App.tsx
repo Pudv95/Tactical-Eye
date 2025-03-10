@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import { browser } from "webextension-polyfill-ts";
 
 const App = () => {
+  const [turn, setTurn] = useState<string>("w");
   const [castling, setCastling] = useState<string>("KQkq");
   const [enPassant, setEnPassant] = useState<string>("-");
   const [halfmoveClock, setHalfmoveClock] = useState<number>(0);
@@ -10,36 +11,58 @@ const App = () => {
   const [fen, setFen] = useState<string>("");
 
 
-  useEffect(() => {
-    const handleMessage = (message: { type: string; data: string }) => {
-        if (message.type === "fen") {
-            setFen(message.data);
-        }
-    };
-
-    browser.runtime.onMessage.addListener(handleMessage);
-    return () => {
-        browser.runtime.onMessage.removeListener(handleMessage);
-    };
-}, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("it is pressed");
     e.preventDefault();
-  const storedFen = await browser.storage.local.get("fen");
-      if (storedFen.fen) {
-        setFen(`${storedFen.fen} ${castling} ${enPassant} ${halfmoveClock} ${fullmoveNumber}`)
-      } else {
-          browser.runtime.sendMessage({ type: "getFen" });
-      }
+    const storedData = await browser.storage.local.get("fen");
+    if (storedData.fen) {
+      const completeFen = `${storedData.fen.split(" ")[0]} ${turn} ${castling} ${enPassant} ${halfmoveClock} ${fullmoveNumber}`;
+      await browser.storage.local.set({ fen: completeFen });
+      console.log("Complete FEN:", completeFen);
+      setFen(completeFen);
+    }
   };
 
+  // async function _(newFen: String){
+  //   console.log("called detectMove with newFen:", newFen);
+  //   if (chess == null) return;
+  //   let previousFen = chess.fen()
+
+  //   if (previousFen && newFen && previousFen !== newFen) {
+  //     const chess = new Chess(previousFen);
+  //     const moves = chess.moves({ verbose: true });
+
+  //     let detectedMove = null;
+  //     for (const move of moves) {
+  //       const tempChess = new Chess(previousFen);
+  //       tempChess.move(move.san);
+  //       if (tempChess.fen().split(" ")[0] === newFen.split(" ")[0]) {
+  //         detectedMove = move;
+  //         break;
+  //       }
+  //     }
+
+  //     if (detectedMove) {
+  //       console.log(`Move detected: ${detectedMove.from} → ${detectedMove.to}`);
+  //     }
+
+  //     await browser.storage.local.set({ completeFen: newFen });
+  //   }
+  // }
 
 
   return (
     <div className="container">
       <h1>FEN String Input</h1>
       <form onSubmit={handleSubmit}>
+        <label>Turn:</label>
+        <select
+          value={turn}
+          onChange={(e) => setTurn(e.target.value)}
+          required
+        >
+          <option value="w">White</option>
+          <option value="b">Black</option>
+        </select>
         <label>Castling Rights:</label>
         <input
           type="text"

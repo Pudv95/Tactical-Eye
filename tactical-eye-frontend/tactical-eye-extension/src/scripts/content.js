@@ -14,9 +14,7 @@ function extractContent() {
     if (match && match[1]) {
         let extractedContent = match[1].trim();
         const fenString = htmlToFEN(extractedContent.split("").reverse().join(""));
-        browser.storage.local.set({ fen: fenString });
-        browser.runtime.sendMessage({ type: "fen", data: fenString });
-        console.log("FEN:", fenString);
+        return fenString;
     } else {
         browser.storage.local.set({ fen: "Some error" });
     }
@@ -54,6 +52,27 @@ function htmlToFEN(htmlString) {
 
     return fen;
 }
+
+const observer = new MutationObserver( async (mutationsList) => {
+    for (let mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+            const fenString = extractContent();
+            const storedFen = await browser.storage.local.get("fen");
+            if(fenString !== storedFen.fen) {
+                // browser.runtime.sendMessage({ type: "MoveMade", data: fenString });
+            }
+        }
+    }
+});
+
+const chessBoard = document.querySelector("wc-chess-board.board");
+
+if (chessBoard) {
+    observer.observe(chessBoard, {
+        childList: true,
+    });
+}
+
 
 
 browser.runtime.onMessage.addListener((message) => {
