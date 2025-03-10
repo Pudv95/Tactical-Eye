@@ -21,7 +21,6 @@ const pythonTools = {
 
             });
             pythonProcess.on('close', (code) => {
-                console.log("failed")
                 reject(code.toString())
             });
         }).catch((err) => {

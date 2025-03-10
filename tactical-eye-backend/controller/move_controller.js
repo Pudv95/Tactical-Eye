@@ -4,16 +4,20 @@ const { Chess } = require('chess.js');
 
 function getMoveCoordinates(fen, algebraicMove) {
     algebraicMove.replace('x', '');
-    console.log(fen);
-    const chess = new Chess(fen);
-    console.log(chess.moves());
-    const move = chess.move(algebraicMove);
-    if (!move) {
-        return "Invalid move!";
+    try {
+        console.log(fen);
+        const chess = new Chess(fen);
+        const move = chess.move(algebraicMove);
+        if (!move) {
+            return "Invalid move!";
+        }
+        const sourceSquare = move ? move.from : null;
+        const destination = move ? move.to : null;
+        return sourceSquare ? `${sourceSquare} ${destination}` : "Piece not found!";
+    } catch (error) {
+        console.log(error);
+        return error.toString();
     }
-    const sourceSquare = move ? move.from : null;
-    const destination = move ? move.to : null;
-    return sourceSquare ? `${sourceSquare} ${destination}` : "Piece not found!";
 }
 
 const moveController = {
