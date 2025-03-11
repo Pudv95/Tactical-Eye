@@ -1,5 +1,5 @@
 
-# Chess AI Project
+# Tactical-Eye
 
 ## Overview
 This project integrates a **chess engine, a backend, a frontend, and a browser extension** to analyze chess positions and make intelligent decisions. The website allows users to **upload a FEN string and play the rest of the game**, while the browser extension enhances the Chess.com experience with move visualization.
