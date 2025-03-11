@@ -6,6 +6,11 @@
     "action": {
         "default_popup": "index.html"
     },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "pudb95@chessExtension"
+        }
+    },
     "background": {
         "scripts": [
             "background.js"

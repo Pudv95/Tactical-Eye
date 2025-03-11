@@ -174,11 +174,8 @@ async function getFen() {
         }
         let extractedContent = match[1].trim();
         var fenString = htmlToFEN(extractedContent.split("").reverse().join("")) + oldStatus;
-        console.log("fenstring: " + fenString)
         if (previousFen !== fenString) {
-            console.log(`previous fen : ${previousFen}\nnew fen: ${fenString}`)
             fenString = updatedFen(previousFen, fenString);
-            console.log("Fetching the best move...!!!");
             fetch('https://tactical-eye-api.pudv95.me/api/', {
                 method: 'POST',
                 headers: {
