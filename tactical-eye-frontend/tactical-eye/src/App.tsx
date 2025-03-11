@@ -208,8 +208,8 @@ const App: React.FC = () => {
             onClick={() => setShowBox(false)}
             style={{
               position: "absolute",
-              top: "10px",
-              right: "10px",
+              top: "8px",
+              right: "8px",
               background: "none",
               border: "none",
               fontSize: "1.2rem",
@@ -220,19 +220,19 @@ const App: React.FC = () => {
             ×
           </button>
            {/* Image Upload Section */}
-           <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
-            <h3 style={{ fontSize: "1.2rem", fontWeight: "600", textAlign: "left" }}>Upload Chessboard Image</h3>
+           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "10px" }}>
+            <h3 style={{ fontSize: "1.5rem", fontWeight: "800", textAlign: "left" }}>Upload Chessboard Image</h3>
             <input
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              style={{ padding: "8px", borderRadius: "4px", width: "100%" }}
+              style={{ padding: "4px", borderRadius: "4px", width: "100%" }}
             />
           </div>
 
           {/* Chess Metadata Input Box */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <h3 style={{ fontSize: "1.2rem", fontWeight: "600", textAlign: "left" }}>Chess Metadata</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <h3 style={{ fontSize: "1.4rem", fontWeight: "800", textAlign: "left" }}>Chess Metadata</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
               <label>Whose turn is this?</label>
               <select
