@@ -9,6 +9,17 @@ const App: React.FC = () => {
   const [bestMoveArrow, setBestMoveArrow] = useState<Arrow[]>([]);
   const [game, _] = useState(new Chess()); // Chess.js game instance
 
+  // State for chess metadata
+  const [turn, setTurn] = useState("w"); // 'w' for White, 'b' for Black
+  const [castling, setCastling] = useState("KQkq");
+  const [enPassant, setEnPassant] = useState("-");
+  const [halfMoveClock, setHalfMoveClock] = useState(0);
+  const [fullMoveNumber, setFullMoveNumber] = useState(1);
+
+   // State to control the visibility of the box
+   const [showBox, setShowBox] = useState(false);
+
+
   // Handle file upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -22,6 +33,7 @@ const App: React.FC = () => {
   // Call the Python backend to get the best move
   const getBestMove = async (currentFen: string) => {
     const baseURI = process.env.BASE_URL;
+    console.log("base URI: ", baseURI);
     try {
       const response = await fetch(`${baseURI}/api/`, {
         method: "POST",
@@ -30,6 +42,8 @@ const App: React.FC = () => {
         },
         body: JSON.stringify({ fenstring: currentFen }),
       });
+
+      console.log("Response : ", response.status);
 
       if (!response.ok) {
         throw new Error("Failed to fetch best move");
@@ -165,47 +179,114 @@ const App: React.FC = () => {
           {/* "OR" Text */}
           <p style={{ margin: "10px 0", fontSize: "1rem", color: "#666" }}>OR</p>
 
-          {/* Image Upload */}
-          <div style={{ position: "relative", marginBottom: "10px" }}>
-  {/* Hidden File Input */}
-    <input
-      type="file"
-      accept="image/*"
-      onChange={handleImageUpload}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        opacity: 0, // Hide the input
-        cursor: "pointer", // Show pointer cursor
-      }}
-      id="file-input" // Add an ID for the label
-    />
-
-    {/* Custom Button */}
-    <label
-      htmlFor="file-input" // Associate label with the input
-      style={{
-        display: "inline-block",
-        padding: "8px 28px",
-        fontSize: "1rem",
-        border: "2px solid #007bff", // Blue border
-        borderRadius: "4px", // Rounded corners
-        backgroundColor: "#007bff", // Blue background
-        color: "#fff", // White text
-        cursor: "pointer", // Pointer cursor
-        textAlign: "center",
-      }}
-    >
-      Upload
-    </label>
-  </div>
-          {/* Loading Indicator */}
-          {/* {isLoading && <p style={{ fontSize: "1rem" }}>Loading best move...</p>} */}
+          {/* Upload Button */}
+          <button
+            onClick={() => setShowBox(!showBox)} // Toggle visibility
+            style={{ padding: "8px 16px", marginBottom: "10px", cursor: "pointer", fontSize: "1rem" }}
+          >
+            Upload
+          </button>
         </div>
       </div>
+
+      {/* Box (Conditional Rendering) */}
+      {showBox && (
+        <div style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: " rgb(50, 57, 65)", // Changed background color to silver
+          padding: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+          zIndex: 1000,
+          width: "300px",
+        }}>
+          {/* Close Button */}
+          <button
+            onClick={() => setShowBox(false)}
+            style={{
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              background: "none",
+              border: "none",
+              fontSize: "1.2rem",
+              cursor: "pointer",
+              color: "#000",
+            }}
+          >
+            ×
+          </button>
+           {/* Image Upload Section */}
+           <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
+            <h3 style={{ fontSize: "1.2rem", fontWeight: "600", textAlign: "left" }}>Upload Chessboard Image</h3>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              style={{ padding: "8px", borderRadius: "4px", width: "100%" }}
+            />
+          </div>
+
+          {/* Chess Metadata Input Box */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <h3 style={{ fontSize: "1.2rem", fontWeight: "600", textAlign: "left" }}>Chess Metadata</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <label>Whose turn is this?</label>
+              <select
+                value={turn}
+                onChange={(e) => setTurn(e.target.value)}
+                style={{ padding: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+              >
+                <option value="w">White</option>
+                <option value="b">Black</option>
+              </select>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <label>Castling Rights</label>
+              <input
+                type="text"
+                value={castling}
+                onChange={(e) => setCastling(e.target.value)}
+                placeholder="e.g., KQkq"
+                style={{ padding: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <label>En Passant Target</label>
+              <input
+                type="text"
+                value={enPassant}
+                onChange={(e) => setEnPassant(e.target.value)}
+                placeholder="e.g., e3"
+                style={{ padding: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <label>Halfmove Clock</label>
+              <input
+                type="number"
+                value={halfMoveClock}
+                onChange={(e) => setHalfMoveClock(Number(e.target.value))}
+                placeholder="e.g., 0"
+                style={{ padding: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <label>Fullmove Number</label>
+              <input
+                type="number"
+                value={fullMoveNumber}
+                onChange={(e) => setFullMoveNumber(Number(e.target.value))}
+                placeholder="e.g., 1"
+                style={{ padding: "5px", border: "1px solid #ccc", borderRadius: "4px" }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
